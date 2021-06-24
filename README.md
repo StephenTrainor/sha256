@@ -44,8 +44,10 @@ Variables at the top of the makefile can be adjusted to your preferences
 
 Legacy just holds previous versions of my sha256 code
 
+I am on windows and I use WSL to get access to POSIX functions (see disclaimer for more information)
+
 ### Disclaimer
 
 I have not tested any of these programs on a mac
 
-On windows (and maybe mac) `getdelim()` is not available becuase `getdelim()` is a POSIX function. An alternative is to add `#define _GNU_SOURCE` above `#include <stdio.h>`, but this may not work (still worth a shot). Booting into WSL to get access to POSIX functions.
+On windows (and maybe mac) `getdelim()` is not available becuase `getdelim()` is a POSIX function. An alternative is to add `#define _GNU_SOURCE` above `#include <stdio.h>`, but this may not work (still worth a shot).
