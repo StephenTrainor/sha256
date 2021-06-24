@@ -1,20 +1,32 @@
 CC=gcc
+REQ=sha256.c sha256.h main.c
 CFLAGS=-Werror -Wextra -Wno-sign-compare -Wshadow
 CDEBUG=-g
-TXTFILE=abc.txt
+TXTFILE=texts/abc.txt
 
-all: sha256.c
+all: $(REQ)
 	find . -type f -exec touch {} +
-	$(CC) sha256.c -o sha256 $(CFLAGS)
+	$(CC) main.c -c -o main.o $(CFLAGS)
+	$(CC) sha256.c -c -o sha256.o $(CFLAGS)
+	$(CC) main.o sha256.o -o sha256
+	rm main.o
+	rm sha256.o
 	./sha256 $(TXTFILE)
 
-clang: sha256.c
+clang: $(REQ)
 	find . -type f -exec touch {} +
-	clang sha256.c -o sha256 $(CFLAGS) -lm
+	clang main.c -c -o main.o $(CFLAGS) -lm
+	clang sha256.c -c -o sha256.o $(CFLAGS) -lm
+	clang main.o sha256.o -o sha256
+	rm main.o
+	rm sha256.o
 	./sha256 $(TXTFILE)
 
-debug: sha256.c
+debug: $(REQ)
 	find . -type f -exec touch {} +
-	$(CC) sha256.c -o sha256 $(CFLAGS) $(CDEBUG)
+	$(CC) main.c -c -o main.o $(CFLAGS) $(CDEBUG)
+	$(CC) sha256.c -c -o sha256.o $(CFLAGS) $(CDEBUG)
+	$(CC) main.o sha256.o -o sha256
+	rm main.o
+	rm sha256.o
 	./sha256 $(TXTFILE)
-
