@@ -22,9 +22,15 @@ Setup for linux/wsl
 
 Setup for windows
 
-`Download mingw-get-setup.exe at https://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download`
+Download mingw-get-setup.exe at `https://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download`
 
 `Run the exe and follow installation steps`
+
+`make`
+
+Setup for mac
+
+Download developer tools via Apple's Xcode or Apple's website at `https://developer.apple.com/develop/`
 
 `make`
 
