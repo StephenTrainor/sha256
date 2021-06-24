@@ -8,6 +8,11 @@ all: sha256.c
 	$(CC) sha256.c -o sha256 $(CFLAGS)
 	./sha256 $(TXTFILE)
 
+clang: sha256.c
+	find . -type f -exec touch {} +
+	clang sha256.c -o sha256 $(CFLAGS) -lm
+	./sha256 $(TXTFILE)
+
 debug: sha256.c
 	find . -type f -exec touch {} +
 	$(CC) sha256.c -o sha256 $(CFLAGS) $(CDEBUG)
