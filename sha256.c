@@ -1,15 +1,9 @@
 #include <math.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
-#define BIT_BLOCK_SIZE 512
-
-typedef struct b {
-	uint8_t p[64];
-} block;
+#include "sha256.h"
 
 static const uint32_t K[64] = {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 
@@ -40,24 +34,19 @@ static inline uint32_t SIGMA1(uint32_t x);
 static inline uint32_t sigma0(uint32_t x);
 static inline uint32_t sigma1(uint32_t x);
 static inline char* itoa_c(int val, int base); // GCC itoa from https://www.strudel.org.uk/itoa/
-static inline bool little_endian(void);        // Function from https://www.cs-fundamentals.com/tech-interview/c/c-program-to-check-little-and-big-endian-architecture/ 
+static inline bool little_endian(void);        // Function from https://www.cs-fundamentals.com/tech-interview/c/c-program-to-check-little-and-big-endian-architecture/
 
-int main(int argc, char* argv[]) {
-	if (argc != 2) {
-		printf("Invalid usage.\nUsage: ./sha256 {relative path to file}\n");
-		return 1;
-	}
-	
-	FILE* input_file = fopen(argv[1], "r");
+void sha256(char* filename, uint32_t message_digest[]) {
+	FILE* input_file = fopen(filename, "r");
 	
 	if (input_file == NULL) { // Check for null pointer
 		printf("NULL pointer.\n"); 
-		return 2; 
+		return; 
 	} 
 	
 	char* M = NULL;
 
-       	size_t len;
+    size_t len;
 	ssize_t bytes = getdelim(&M, &len, '\0', input_file) - 1; // Read input_file into M
 
 	if (bytes == -2) {
@@ -124,14 +113,6 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	/*
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < BIT_BLOCK_SIZE / 8; j++) {
-			printf("%s", itoa_c(blocks[i].p[j], 2));
-		}
-	}
-	*/
-
 	uint32_t T1, T2; // Temp words
 
 	uint32_t a, b, c, d, e, f, g, h; // Working variables
@@ -191,13 +172,12 @@ int main(int argc, char* argv[]) {
 	}
 
 	for (unsigned int i = 0; i < 8; i++) {
-		printf("%08x", H[i]); // Display the message digest
+		message_digest[i] = H[i];
 	}
 
-	printf("\n");
-
 	fclose(input_file);
-	return 0;
+
+	return;
 }
 
 static inline uint32_t rotr(uint32_t x, uint8_t n) {
@@ -236,7 +216,7 @@ static inline uint32_t sigma1(uint32_t x) {
 	return rotr(x, 17) ^ rotr(x, 19) ^ shr(x, 10);
 }
 
-static inline char* itoa_c(int val, int base) {	
+static inline char* itoa_c(int val, int base) {
 	static char buf[32] = {0};
 
 	int i = 30;
@@ -248,7 +228,7 @@ static inline char* itoa_c(int val, int base) {
 	return &buf[i + 1];
 }
 
-static inline bool little_endian(void) { 
+static inline bool little_endian(void) {
 	unsigned int i = 1;
 	char* c = (char*) &i;
 	return (int)*c;
