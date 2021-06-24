@@ -30,9 +30,9 @@ static const uint32_t K[64] = {
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-static inline uint32_t rotr(uint32_t x, uint16_t n);
-static inline uint32_t rotl(uint32_t x, uint16_t n);
-static inline uint32_t shr(uint32_t x, uint16_t n);
+static inline uint32_t rotr(uint32_t x, uint8_t n);
+static inline uint32_t rotl(uint32_t x, uint8_t n);
+static inline uint32_t shr(uint32_t x, uint8_t n);
 static inline uint32_t ch(uint32_t x, uint32_t y, uint32_t z);
 static inline uint32_t maj(uint32_t x, uint32_t y, uint32_t z);
 static inline uint32_t SIGMA0(uint32_t x);
@@ -40,6 +40,7 @@ static inline uint32_t SIGMA1(uint32_t x);
 static inline uint32_t sigma0(uint32_t x);
 static inline uint32_t sigma1(uint32_t x);
 static inline char* itoa_c(int val, int base);
+static inline bool little_endian(void);
 
 int main(int argc, char* argv[]) {
 	if (argc != 2) {
@@ -47,9 +48,9 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	
-	FILE* input_file = fopen(argv[1], "r"); 
+	FILE* input_file = fopen(argv[1], "r");
 	
-	if (input_file == NULL) { 
+	if (input_file == NULL) { // Check for null pointer
 		printf("NULL pointer.\n"); 
 		return 2; 
 	} 
@@ -57,10 +58,10 @@ int main(int argc, char* argv[]) {
 	char* M = NULL;
 
        	size_t len;
-	ssize_t bytes = getdelim(&M, &len, '\0', input_file) - 1;
+	ssize_t bytes = getdelim(&M, &len, '\0', input_file) - 1; // Read input_file into M
 
 	if (bytes == -2) {
-		bytes = 0;
+		bytes = 0; // Ensures that '\0' isn't hashed for an empty file
 	}
 
 	uint64_t l = bytes * 8;
@@ -69,14 +70,19 @@ int main(int argc, char* argv[]) {
 
 	block blocks[N];
 
-	uint8_t temp_parts[8];
-
-	memcpy(temp_parts, &l, sizeof(l));
-
 	uint8_t parts[8];
-	
-	for (int i = 0; i < 8; i++) {
-		parts[i] = temp_parts[7 - i];
+
+	if (little_endian()) {
+		uint8_t temp_parts[8]; 
+
+		memcpy(temp_parts, &l, sizeof(l));
+
+		for (int i = 0; i < 8; i++) {
+			parts[i] = temp_parts[7 - i]; // Reverse the array to convert to big-endian
+		}
+	}
+	else {
+		memcpy(parts, &l, sizeof(l)); // Already big-endian, no changes needed
 	}
 
 	bool finished_filling = false;
@@ -98,21 +104,21 @@ int main(int argc, char* argv[]) {
 
 			if (finished_filling && !finished_padding) {
 				if (bytes_padded != 0) {
-					blocks[a].p[b] = 0x00;
+					blocks[a].p[b] = 0x00; // Pad message with zeroes
 				}
 				else {
-					blocks[a].p[b] = 0x80;
+					blocks[a].p[b] = 0x80; // aka 0b10000000
 				}
 				bytes_padded++;
 			}
 			else if (finished_filling && finished_padding) {
 				for (int i = 0; i < 8; i++) {
-					blocks[a].p[b + i] = parts[i];
+					blocks[a].p[b + i] = parts[i]; // add the 64-bit message length signature
 				}
 				break;
 			}
 			else {
-				blocks[a].p[b] = M[bytes_filled];
+				blocks[a].p[b] = M[bytes_filled]; // Fill message block
 				bytes_filled++;
 			}
 		}
@@ -121,18 +127,18 @@ int main(int argc, char* argv[]) {
 	/*
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < BIT_BLOCK_SIZE / 8; j++) {
-			printf("%s-", itoa_c(blocks[i].p[j], 2));
+			printf("%s", itoa_c(blocks[i].p[j], 2));
 		}
 	}
 	*/
 
-	uint32_t T1, T2;
+	uint32_t T1, T2; // Temp words
 
-	uint32_t a, b, c, d, e, f, g, h;
+	uint32_t a, b, c, d, e, f, g, h; // Working variables
 
-	uint32_t W[64];
+	uint32_t W[64]; // Message schedule
 
-	uint32_t H[8] = {
+	uint32_t H[8] = { // Initial hash values
 		0x6a09e667,
 		0xbb67ae85,
 		0x3c6ef372,
@@ -145,14 +151,14 @@ int main(int argc, char* argv[]) {
 
 	for (unsigned int i = 0; i < N; i++) {
 		for (unsigned int t = 0; t < 64; t += 4) {
-			W[t / 4] = blocks[i].p[t] << 24 | blocks[i].p[t + 1] << 16 | blocks[i].p[t + 2] << 8 | blocks[i].p[t + 3];
+			W[t / 4] = blocks[i].p[t] << 24 | blocks[i].p[t + 1] << 16 | blocks[i].p[t + 2] << 8 | blocks[i].p[t + 3]; // Concat four uint8_t's into one 32-bit word
 		}
 
 		for (unsigned int t = 16; t < 64; t++) { 
-			W[t] = sigma1(W[t - 2]) + W[t - 7] + sigma0(W[t - 15]) + W[t - 16];
+			W[t] = sigma1(W[t - 2]) + W[t - 7] + sigma0(W[t - 15]) + W[t - 16]; // Fill the message schedule
 		}
 
-		a = H[0];
+		a = H[0]; // Initialize working variables
 		b = H[1];
 		c = H[2];
 		d = H[3];
@@ -161,7 +167,7 @@ int main(int argc, char* argv[]) {
 		g = H[6];
 		h = H[7];
 
-		for (unsigned int t = 0; t < 64; t++) {
+		for (unsigned int t = 0; t < 64; t++) { // loop through message schedule and constants
 			T1 = h + SIGMA1(e) + ch(e, f, g) + K[t] + W[t];
 			T2 = SIGMA0(a) + maj(a, b, c);
 			h = g;
@@ -174,7 +180,7 @@ int main(int argc, char* argv[]) {
 			a = T1 + T2;
 		}
 
-		H[0] += a;
+		H[0] += a; // Calc the intermediate hash values
 		H[1] += b;
 		H[2] += c;
 		H[3] += d;
@@ -185,7 +191,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	for (unsigned int i = 0; i < 8; i++) {
-		printf("%08x", H[i]);
+		printf("%08x", H[i]); // Display the message digest
 	}
 
 	printf("\n");
@@ -194,15 +200,15 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-static inline uint32_t rotr(uint32_t x, uint16_t n) {
+static inline uint32_t rotr(uint32_t x, uint8_t n) {
 	return (x >> n) | (x << (32 - n));
 }
 
-static inline uint32_t rotl(uint32_t x, uint16_t n) {
+static inline uint32_t rotl(uint32_t x, uint8_t n) {
 	return (x << n) | (x >> (32 - n));
 }
 
-static inline uint32_t shr(uint32_t x, uint16_t n) {
+static inline uint32_t shr(uint32_t x, uint8_t n) {
 	return x >> n;
 }
 
@@ -241,3 +247,10 @@ static inline char* itoa_c(int val, int base) {
 
 	return &buf[i + 1];
 }
+
+static inline bool little_endian(void) {
+	unsigned int i = 1;
+	char* c = (char*) &i;
+	return (int)*c;
+}
+
