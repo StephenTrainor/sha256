@@ -41,3 +41,11 @@ Clang be used alternatively and run `make clang` instead
 Any lines with `find . -type f -exec touch {} +` can be removed
 
 Variables at the top of the makefile can be adjusted to your preferences
+
+Legacy just holds previous versions of my sha256 code
+
+### Disclaimer
+
+I have not tested any of these programs on a mac
+
+On windows (and maybe mac) `getdelim()` is not available becuase `getdelim()` is a POSIX function. An alternative is to add `#define _GNU_SOURCE` above `#include <stdio.h>`, but this may not work (still worth a shot). Booting into WSL to get access to POSIX functions.
