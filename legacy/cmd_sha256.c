@@ -46,6 +46,7 @@ static inline bool little_endian(void);        // Function from https://www.cs-f
 
 int main(void) {
     int bytes;
+	
     printf("Length: ");
     scanf("%i", &bytes);
 
