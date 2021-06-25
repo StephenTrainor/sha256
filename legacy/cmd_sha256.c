@@ -56,131 +56,131 @@ int main(void) {
         scanf("%c", &M[i]);
     }
 
-	uint64_t l = bytes * 8;
-	int N = ceil((64 + 1 + l) / BIT_BLOCK_SIZE) + 1;
-	int k = (BIT_BLOCK_SIZE * N) - 65 - l;
+    uint64_t l = bytes * 8;
+    int N = ceil((64 + 1 + l) / BIT_BLOCK_SIZE) + 1;
+    int k = (BIT_BLOCK_SIZE * N) - 65 - l;
 
-	block blocks[N];
+    block blocks[N];
 
-	uint8_t parts[8];
+    uint8_t parts[8];
 
-	if (little_endian()) {
-		uint8_t temp_parts[8]; 
+    if (little_endian()) {
+	    uint8_t temp_parts[8]; 
 
-		memcpy(temp_parts, &l, sizeof(l));
+	    memcpy(temp_parts, &l, sizeof(l));
 
-		for (int i = 0; i < 8; i++) {
-			parts[i] = temp_parts[7 - i]; // Reverse the array to convert to big-endian
-		}
-	}
-	else {
-		memcpy(parts, &l, sizeof(l)); // Already big-endian, no changes needed
-	}
+	    for (int i = 0; i < 8; i++) {
+		    parts[i] = temp_parts[7 - i]; // Reverse the array to convert to big-endian
+	    }
+    }
+    else {
+	    memcpy(parts, &l, sizeof(l)); // Already big-endian, no changes needed
+    }
 
-	bool finished_filling = false;
-	bool finished_padding = false;
+    bool finished_filling = false;
+    bool finished_padding = false;
 
-	int padding_bytes_needed = (k + 1) / 8;
+    int padding_bytes_needed = (k + 1) / 8;
 
-	int bytes_filled = 0;
-	int bytes_padded = 0;
+    int bytes_filled = 0;
+    int bytes_padded = 0;
 
-	for (int a = 0; a < N; a++) {
-		for (int b = 0; b < BIT_BLOCK_SIZE / 8; b++) {
-			if (bytes_filled == bytes) {
-				finished_filling = true;
-			}
-			if (bytes_padded == padding_bytes_needed) {
-				finished_padding = true;
-			}
+    for (int a = 0; a < N; a++) {
+	    for (int b = 0; b < BIT_BLOCK_SIZE / 8; b++) {
+		    if (bytes_filled == bytes) {
+			    finished_filling = true;
+		    }
+		    if (bytes_padded == padding_bytes_needed) {
+			    finished_padding = true;
+		    }
 
-			if (finished_filling && !finished_padding) {
-				if (bytes_padded != 0) {
-					blocks[a].p[b] = 0x00; // Pad message with zeroes
-				}
-				else {
-					blocks[a].p[b] = 0x80; // aka 0b10000000
-				}
-				bytes_padded++;
-			}
-			else if (finished_filling && finished_padding) {
-				for (int i = 0; i < 8; i++) {
-					blocks[a].p[b + i] = parts[i]; // add the 64-bit message length signature
-				}
-				break;
-			}
-			else {
-				blocks[a].p[b] = M[bytes_filled]; // Fill message block
-				bytes_filled++;
-			}
-		}
-	}
+		    if (finished_filling && !finished_padding) {
+			    if (bytes_padded != 0) {
+				    blocks[a].p[b] = 0x00; // Pad message with zeroes
+			    }
+			    else {
+				    blocks[a].p[b] = 0x80; // aka 0b10000000
+			    }
+			    bytes_padded++;
+		    }
+		    else if (finished_filling && finished_padding) {
+			    for (int i = 0; i < 8; i++) {
+				    blocks[a].p[b + i] = parts[i]; // add the 64-bit message length signature
+			    }
+			    break;
+		    }
+		    else {
+			    blocks[a].p[b] = M[bytes_filled]; // Fill message block
+			    bytes_filled++;
+		    }
+	    }
+    }
 
-	uint32_t T1, T2; // Temp words
+    uint32_t T1, T2; // Temp words
 
-	uint32_t a, b, c, d, e, f, g, h; // Working variables
+    uint32_t a, b, c, d, e, f, g, h; // Working variables
 
-	uint32_t W[64]; // Message schedule
+    uint32_t W[64]; // Message schedule
 
-	uint32_t H[8] = { // Initial hash values
-		0x6a09e667,
-		0xbb67ae85,
-		0x3c6ef372,
-		0xa54ff53a,
-		0x510e527f,
-		0x9b05688c,
-		0x1f83d9ab,
-		0x5be0cd19
-	};
+    uint32_t H[8] = { // Initial hash values
+	    0x6a09e667,
+	    0xbb67ae85,
+	    0x3c6ef372,
+	    0xa54ff53a,
+	    0x510e527f,
+	    0x9b05688c,
+	    0x1f83d9ab,
+	    0x5be0cd19
+    };
 
-	for (unsigned int i = 0; i < N; i++) {
-		for (unsigned int t = 0; t < 64; t += 4) {
-			W[t / 4] = blocks[i].p[t] << 24 | blocks[i].p[t + 1] << 16 | blocks[i].p[t + 2] << 8 | blocks[i].p[t + 3]; // Concat four uint8_t's into one 32-bit word
-		}
+    for (unsigned int i = 0; i < N; i++) {
+	    for (unsigned int t = 0; t < 64; t += 4) {
+		    W[t / 4] = blocks[i].p[t] << 24 | blocks[i].p[t + 1] << 16 | blocks[i].p[t + 2] << 8 | blocks[i].p[t + 3]; // Concat four uint8_t's into one 32-bit word
+	    }
 
-		for (unsigned int t = 16; t < 64; t++) { 
-			W[t] = sigma1(W[t - 2]) + W[t - 7] + sigma0(W[t - 15]) + W[t - 16]; // Fill the message schedule
-		}
+	    for (unsigned int t = 16; t < 64; t++) { 
+		    W[t] = sigma1(W[t - 2]) + W[t - 7] + sigma0(W[t - 15]) + W[t - 16]; // Fill the message schedule
+	    }
 
-		a = H[0]; // Initialize working variables
-		b = H[1];
-		c = H[2];
-		d = H[3];
-		e = H[4];
-		f = H[5];
-		g = H[6];
-		h = H[7];
+	    a = H[0]; // Initialize working variables
+	    b = H[1];
+	    c = H[2];
+	    d = H[3];
+	    e = H[4];
+	    f = H[5];
+	    g = H[6];
+	    h = H[7];
 
-		for (unsigned int t = 0; t < 64; t++) { // loop through message schedule and constants
-			T1 = h + SIGMA1(e) + ch(e, f, g) + K[t] + W[t];
-			T2 = SIGMA0(a) + maj(a, b, c);
-			h = g;
-			g = f;
-			f = e;
-			e = d + T1;
-			d = c;
-			c = b;
-			b = a;
-			a = T1 + T2;
-		}
+	    for (unsigned int t = 0; t < 64; t++) { // loop through message schedule and constants
+	            T1 = h + SIGMA1(e) + ch(e, f, g) + K[t] + W[t];
+		    T2 = SIGMA0(a) + maj(a, b, c);
+		    h = g;
+		    g = f;
+		    f = e;
+		    e = d + T1;
+		    d = c;
+		    c = b;
+		    b = a;
+		    a = T1 + T2;
+	    }
 
-		H[0] += a; // Calc the intermediate hash values
-		H[1] += b;
-		H[2] += c;
-		H[3] += d;
-		H[4] += e;
-		H[5] += f;
-		H[6] += g;
-		H[7] += h;
-	}
+	    H[0] += a; // Calc the intermediate hash values
+	    H[1] += b;
+	    H[2] += c;
+	    H[3] += d;
+	    H[4] += e;
+	    H[5] += f;
+	    H[6] += g;
+	    H[7] += h;
+    }
 
-	for (unsigned int i = 0; i < 8; i++) {
-		printf("%08x", H[i]); // Display the message digest
-	}
+    for (unsigned int i = 0; i < 8; i++) {
+	    printf("%08x", H[i]); // Display the message digest
+    }
 
-	printf("\n");
+    printf("\n");
 
-	return 0;
+    return 0;
 }
 
 static inline uint32_t rotr(uint32_t x, uint8_t n) {
