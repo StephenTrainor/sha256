@@ -14,6 +14,7 @@ or for clang
 
 `clang --version`
 
+
 Setup for linux/wsl
 
 `sudo apt update`
@@ -24,6 +25,7 @@ Setup for linux/wsl
 
 `make`
 
+
 Setup for windows
 
 Download mingw-get-setup.exe at `https://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download`
@@ -31,6 +33,7 @@ Download mingw-get-setup.exe at `https://sourceforge.net/projects/mingw/files/In
 Run the exe and follow installation steps
 
 `make windows`
+
 
 Setup for mac
 
