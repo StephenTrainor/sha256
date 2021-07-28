@@ -34,10 +34,10 @@ static inline uint32_t SIGMA1(uint32_t x);
 static inline uint32_t sigma0(uint32_t x);
 static inline uint32_t sigma1(uint32_t x);
 static char *getdelim_c(size_t *restrict n, int delim, FILE *restrict stream);
-static char* itoa_c(int val, int base); // GCC itoa from https://www.strudel.org.uk/itoa/
+static char *itoa_c(int val, int base); // GCC itoa from https://www.strudel.org.uk/itoa/
 static bool little_endian(void);        // Function from https://www.cs-fundamentals.com/tech-interview/c/c-program-to-check-little-and-big-endian-architecture/
 
-void sha256(char* filename, uint32_t message_digest[]) {
+void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 	FILE* input_file = fopen(filename, "r");
 	
 	if (input_file == NULL) { // Check for null pointer

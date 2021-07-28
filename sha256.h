@@ -9,6 +9,6 @@ typedef struct {
 	uint8_t p[64];
 } block;
 
-void sha256(char* filename, uint32_t message_digest[]);
+void sha256(char *restrict filename, uint32_t *restrict message_digest);
 
 #endif
