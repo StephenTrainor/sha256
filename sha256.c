@@ -218,6 +218,10 @@ static inline uint32_t sigma1(uint32_t x) {
 }
 
 static char *getdelim_c(size_t *restrict n, int delim, FILE *restrict stream) {
+	if (!n) {
+		return NULL;
+	}
+
     if (!stream) { // Check for null stream
         (*n) = -1;
         return NULL;
