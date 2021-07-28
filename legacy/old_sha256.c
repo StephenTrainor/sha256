@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
 	
 	char* M = NULL;
 
-       	size_t len;
+    size_t len;
 	ssize_t bytes = getdelim(&M, &len, '\0', input_file) - 1; // Read input_file into M
 
 	if (bytes == -2) {
