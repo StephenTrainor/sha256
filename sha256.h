@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-typedef struct b {
+typedef struct {
 	uint8_t p[64];
 } block;
 
