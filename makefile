@@ -15,12 +15,20 @@ all: $(REQ)
 
 clang: $(REQ)
 	find . -type f -exec touch {} +
-	clang main.c -c -o main.o $(CFLAGS) -lm
-	clang sha256.c -c -o sha256.o $(CFLAGS) -lm
-	clang main.o sha256.o -o sha256 $(CFLAGS)
+	clang main.c -c -o main.o $(CFLAGS)
+	clang sha256.c -c -o sha256.o $(CFLAGS)
+	clang main.o sha256.o -o sha256 -lm $(CFLAGS)
 	rm main.o
 	rm sha256.o
 	./sha256 $(TXTFILE)
+
+windows: $(REQ)
+	$(CC) main.c -c -o main.o $(CFLAGS)
+	$(CC) sha256.c -c -o sha256.o $(CFLAGS)
+	$(CC) main.o sha256.o -o sha256 $(CLFAGS)
+	del main.o
+	del sha256.o
+	sha256.exe $(TXTFILE)
 
 debug: $(REQ)
 	find . -type f -exec touch {} +
