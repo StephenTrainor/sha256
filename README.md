@@ -64,6 +64,6 @@ There are various indentation errors that I tried to fix, but they don't show up
 I have not tested any of these programs on a mac
 
 For `posix_sha256.c` only:
-    `posix_sha256.c` relies on a POSIX functions `getdelim()` that is not accessable on windows machines, even with `#define _GNU_SOURCE`. 
+    `posix_sha256.c` relies on a POSIX functions `getdelim()` that is not accessible on windows machines, even with `#define _GNU_SOURCE`. 
 
 Use `sha256.c` at your own risk, I created this function and may not be completely safe.
