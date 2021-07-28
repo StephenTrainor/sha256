@@ -47,7 +47,6 @@ static inline bool little_endian(void);        // Function from https://www.cs-f
 
 int main(void) {
     size_t bytes = 0;
-
 	char *M = stdin_c(&bytes, '\n');
 
     uint64_t l = bytes * 8;
