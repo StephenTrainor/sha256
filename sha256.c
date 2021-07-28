@@ -176,6 +176,7 @@ void sha256(char* filename, uint32_t message_digest[]) {
 	}
 
 	fclose(input_file);
+	free(M);
 
 	return;
 }
@@ -225,9 +226,13 @@ static char *getdelim_c(size_t *restrict n, int delim, FILE *restrict stream) {
     char *buf = malloc(sizeof(char)); // space for terminator is allocated later
     char temp;
 
+	if (!buf) {
+		(*n) = -1;
+		return NULL;
+	}
 
     while ((temp = fgetc(stream)) != EOF && temp != delim && temp != '\n') { // continue if char != specified delimeter
-        char *tmp_ptr = realloc(buf, (*n) + 1); // make room for another char
+        char *tmp_ptr = realloc(buf, (*n) + 1); // expand buffer
 
         if (!tmp_ptr) {
             free(buf);
