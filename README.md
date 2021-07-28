@@ -57,8 +57,6 @@ Variables at the top of the makefile can be adjusted to your preferences
 
 Legacy just holds previous versions of my sha256 code
 
-There are various indentation errors that I tried to fix, but they don't show up in my editor. Many of these can simply be fixed by highlighting the area an indenting from there. Again, this is unintentional and probably has to deal with tabs vs spaces or how many spaces are in a tab in different editors.
-
 ### Disclaimer
 
 I have not tested any of these programs on a mac
