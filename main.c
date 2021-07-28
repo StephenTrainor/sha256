@@ -14,7 +14,6 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < 8; i++) {
         printf("%08x", H[i]);
     }
-
     printf("\n");
 
     return 0;
