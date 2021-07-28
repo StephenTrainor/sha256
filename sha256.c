@@ -46,6 +46,7 @@ void sha256(char* filename, uint32_t message_digest[]) {
 	} 
 	
 	size_t bytes = 0;
+	
 	char *M = getdelim_c(&bytes, '\0', input_file); // Read input_file into M
 
 	if (bytes == -1) {
