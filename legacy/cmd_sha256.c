@@ -172,6 +172,7 @@ int main(void) {
     }
 
     printf("\n");
+	free(M);
 
     return 0;
 }
