@@ -2,13 +2,17 @@
 
 ### A sha256 implementation in C
 
-This implementation uses C and gcc without any external libraries. Only `itoa_c()` and `little_endian()` came from outside sources. GCC is not the only compiler that works with this program, this program also works with clang.
+This implementation uses C without any external libraries. Only `itoa_c()` and `little_endian()` came from outside sources. GCC is not the only compiler that works with this program, this program also works with clang. By default, running `make` will use gcc. This can be changed by editing the makefile or running `make clang`.
 
 ### How to compile
 
 Check for gcc
 
 `gcc --version`
+
+or for clang
+
+`clang --version`
 
 Setup for linux/wsl
 
@@ -24,9 +28,9 @@ Setup for windows
 
 Download mingw-get-setup.exe at `https://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download`
 
-`Run the exe and follow installation steps`
+Run the exe and follow installation steps
 
-`make`
+`make windows`
 
 Setup for mac
 
@@ -44,15 +48,11 @@ However, if `sha256.c` and `sha256.h` are in the same directory, the include in 
 
 ### Notes
 
-Clang be used alternatively and run `make clang` instead
-
-Any lines with `find . -type f -exec touch {} +` can be removed
+Any lines with `find . -type f -exec touch {} +` can be removed (from the makefile)
 
 Variables at the top of the makefile can be adjusted to your preferences
 
 Legacy just holds previous versions of my sha256 code
-
-I am on windows and I use WSL to get access to POSIX functions (see disclaimer for more information)
 
 There are various indentation errors that I tried to fix, but they don't show up in my editor. Many of these can simply be fixed by highlighting the area an indenting from there. Again, this is unintentional and probably has to deal with tabs vs spaces or how many spaces are in a tab in different editors.
 
@@ -60,4 +60,7 @@ There are various indentation errors that I tried to fix, but they don't show up
 
 I have not tested any of these programs on a mac
 
-On windows (and maybe mac) `getdelim()` is not available becuase `getdelim()` is a POSIX function. An alternative is to add `#define _GNU_SOURCE` above `#include <stdio.h>`, but this may not work (still worth a shot).
+For `posix_sha256.c` only:
+    `posix_sha256.c` relies on a POSIX functions `getdelim()` that is not accessable on windows machines, even with `#define _GNU_SOURCE`. 
+
+Use `sha256.c` at your own risk, I created this function and may not be completely safe.
