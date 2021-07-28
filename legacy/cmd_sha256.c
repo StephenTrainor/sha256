@@ -41,20 +41,14 @@ static inline uint32_t SIGMA0(uint32_t x);
 static inline uint32_t SIGMA1(uint32_t x);
 static inline uint32_t sigma0(uint32_t x);
 static inline uint32_t sigma1(uint32_t x);
+static char *stdin_c(size_t *restrict n, int delim);
 static inline char* itoa_c(int val, int base); // GCC itoa from https://www.strudel.org.uk/itoa/
 static inline bool little_endian(void);        // Function from https://www.cs-fundamentals.com/tech-interview/c/c-program-to-check-little-and-big-endian-architecture/ 
 
 int main(void) {
-    int bytes;
-	
-    printf("Length: ");
-    scanf("%i", &bytes);
+    size_t bytes = 0;
 
-    char M[bytes];
-
-    for (int i = 0; i < bytes; i++) {
-        scanf("%c", &M[i]);
-    }
+	char *M = stdin_c(&bytes, '\n');
 
     uint64_t l = bytes * 8;
     int N = ceil((64 + 1 + l) / BIT_BLOCK_SIZE) + 1;
@@ -152,7 +146,7 @@ int main(void) {
 	    h = H[7];
 
 	    for (unsigned int t = 0; t < 64; t++) { // loop through message schedule and constants
-	            T1 = h + SIGMA1(e) + ch(e, f, g) + K[t] + W[t];
+	        T1 = h + SIGMA1(e) + ch(e, f, g) + K[t] + W[t];
 		    T2 = SIGMA0(a) + maj(a, b, c);
 		    h = g;
 		    g = f;
@@ -217,6 +211,37 @@ static inline uint32_t sigma0(uint32_t x) {
 
 static inline uint32_t sigma1(uint32_t x) {
 	return rotr(x, 17) ^ rotr(x, 19) ^ shr(x, 10);
+}
+
+static char *stdin_c(size_t *restrict n, int delim) {
+    char *buf = malloc(sizeof(char));
+    char temp;
+
+    while ((temp = fgetc(stdin)) != EOF && temp != delim && temp != '\n') {
+        char *tmp_ptr = realloc(buf, (*n) + 1);
+
+        if (!tmp_ptr) {
+            free(buf);
+            return NULL;
+        }
+
+        buf = tmp_ptr;
+        buf[(*n)] = temp;
+
+        (*n)++;
+    }
+
+    char *tmp_ptr = realloc(buf, (*n) + 1);
+
+    if (!tmp_ptr) {
+        free(buf);
+        return NULL;
+    }
+
+    buf = tmp_ptr;
+    buf[(*n)] = '\0';
+
+    return buf;
 }
 
 static inline char* itoa_c(int val, int base) {	
