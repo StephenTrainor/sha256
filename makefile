@@ -31,6 +31,10 @@ windows: $(REQ)
 	del sha256.o
 	sha256.exe $(TXTFILE)
 
+asm: $(REQ)
+	$(CC) main.c -S -fverbose-asm -o main.s $(CFLAGS)
+	$(CC) sha256.c -S -fverbose-asm -o sha256.s $(CFLAGS)
+
 debug: $(REQ)
 	find . -type f -exec touch {} +
 	$(CC) main.c -c -o main.o $(CFLAGS) $(CDEBUG)
