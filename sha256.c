@@ -33,6 +33,7 @@ static inline uint32_t SIGMA0(uint32_t x);
 static inline uint32_t SIGMA1(uint32_t x);
 static inline uint32_t sigma0(uint32_t x);
 static inline uint32_t sigma1(uint32_t x);
+static char *getdelim_c(size_t *restrict n, int delim, FILE *restrict stream);
 static char* itoa_c(int val, int base); // GCC itoa from https://www.strudel.org.uk/itoa/
 static bool little_endian(void);        // Function from https://www.cs-fundamentals.com/tech-interview/c/c-program-to-check-little-and-big-endian-architecture/
 
@@ -44,12 +45,10 @@ void sha256(char* filename, uint32_t message_digest[]) {
 		return; 
 	} 
 	
-	char* M = NULL;
+	size_t bytes = 0;
+	char *M = getdelim_c(&bytes, '\0', input_file); // Read input_file into M
 
-    	size_t len;
-	ssize_t bytes = getdelim(&M, &len, '\0', input_file) - 1; // Read input_file into M
-
-	if (bytes == -2) {
+	if (bytes == -1) {
 		bytes = 0; // Ensures that '\0' isn't hashed for an empty file
 	}
 
@@ -214,6 +213,43 @@ static inline uint32_t sigma0(uint32_t x) {
 
 static inline uint32_t sigma1(uint32_t x) {
 	return rotr(x, 17) ^ rotr(x, 19) ^ shr(x, 10);
+}
+
+static char *getdelim_c(size_t *restrict n, int delim, FILE *restrict stream) {
+    if (!stream) { // Check for null stream
+        (*n) = -1;
+        return NULL;
+    }
+
+    char *buf = malloc(sizeof(char)); // space for terminator is allocated later
+    char temp;
+
+
+    while ((temp = fgetc(stream)) != EOF && temp != delim && temp != '\n') { // continue if char != specified delimeter
+        char *tmp_ptr = realloc(buf, (*n) + 1); // make room for another char
+
+        if (!tmp_ptr) {
+            free(buf);
+            return NULL;
+        }
+
+        buf = tmp_ptr;
+        buf[(*n)] = temp;
+
+        (*n)++;
+    }
+
+    char *tmp_ptr = realloc(buf, (*n) + 1);
+
+    if (!tmp_ptr) {
+        free(buf);
+        return NULL;
+    }
+
+    buf = tmp_ptr;
+    buf[(*n)] = '\0'; // Null terminate string
+
+    return buf;
 }
 
 static char* itoa_c(int val, int base) {
