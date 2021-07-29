@@ -46,7 +46,7 @@ static inline char* itoa_c(int val, int base); // GCC itoa from https://www.stru
 static inline bool little_endian(void);        // Function from https://www.cs-fundamentals.com/tech-interview/c/c-program-to-check-little-and-big-endian-architecture/ 
 
 int main(void) {
-	size_t len = 0;
+	size_t bytes = 0;
 	char *M = stdin_c(&bytes, '\n');
 
     uint64_t l = bytes * 8;
