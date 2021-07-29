@@ -89,7 +89,6 @@ void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 	bool finished_padding = false;
 
 	int padding_bytes_needed = (k + 1) / 8;
-
 	int bytes_filled = 0;
 	int bytes_padded = 0;
 
