@@ -43,3 +43,4 @@ debug: $(REQ)
 	rm main.o
 	rm sha256.o
 	./sha256 $(TXTFILE)
+
