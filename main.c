@@ -2,10 +2,10 @@
 #include "sha256.h"
 
 int main(int argc, char* argv[]) {
-	if (argc != 2) {
-		printf("Invalid usage.\nUsage: ./sha256 {relative path to file}\n");
-		return 1;
-	}
+    if (argc != 2) {
+        printf("Invalid usage.\nUsage: ./sha256 {relative path to file}\n");
+        return 1;
+    }
 
     uint32_t H[8];
 
