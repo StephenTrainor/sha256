@@ -12,3 +12,4 @@ typedef struct {
 void sha256(char *restrict filename, uint32_t *restrict message_digest);
 
 #endif
+
