@@ -39,7 +39,6 @@ static inline uint32_t SIGMA0(uint32_t x);
 static inline uint32_t SIGMA1(uint32_t x);
 static inline uint32_t sigma0(uint32_t x);
 static inline uint32_t sigma1(uint32_t x);
-static inline char* itoa_c(int val, int base); // GCC itoa from https://www.strudel.org.uk/itoa/
 static inline bool little_endian(void);        // Function from https://www.cs-fundamentals.com/tech-interview/c/c-program-to-check-little-and-big-endian-architecture/ 
 
 int main(int argc, char* argv[]) {
@@ -234,18 +233,6 @@ static inline uint32_t sigma0(uint32_t x) {
 
 static inline uint32_t sigma1(uint32_t x) {
 	return rotr(x, 17) ^ rotr(x, 19) ^ shr(x, 10);
-}
-
-static inline char* itoa_c(int val, int base) {	
-	static char buf[32] = {0};
-
-	int i = 30;
-
-	for (; val && i ; --i, val /= base) {
-		buf[i] = "0123456789abcdef"[val % base];
-	}
-
-	return &buf[i + 1];
 }
 
 static inline bool little_endian(void) { 

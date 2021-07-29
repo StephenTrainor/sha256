@@ -44,7 +44,6 @@ static inline uint32_t SIGMA0(uint32_t x);
 static inline uint32_t SIGMA1(uint32_t x);
 static inline uint32_t sigma0(uint32_t x);
 static inline uint32_t sigma1(uint32_t x);
-static char* itoa_c(int val, int base); // GCC itoa from https://www.strudel.org.uk/itoa/
 static bool little_endian(void);        // Function from https://www.cs-fundamentals.com/tech-interview/c/c-program-to-check-little-and-big-endian-architecture/
 
 void sha256(char *restrict filename, uint32_t *restrict message_digest) {
@@ -225,18 +224,6 @@ static inline uint32_t sigma0(uint32_t x) {
 
 static inline uint32_t sigma1(uint32_t x) {
 	return rotr(x, 17) ^ rotr(x, 19) ^ shr(x, 10);
-}
-
-static char* itoa_c(int val, int base) {
-	static char buf[32] = {0};
-
-	int i = 30;
-
-	for (; val && i ; --i, val /= base) {
-		buf[i] = "0123456789abcdef"[val % base];
-	}
-
-	return &buf[i + 1];
 }
 
 static bool little_endian(void) {
