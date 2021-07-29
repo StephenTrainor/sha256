@@ -74,7 +74,6 @@ int main(void) {
     bool finished_padding = false;
 
     int padding_bytes_needed = (k + 1) / 8;
-
     int bytes_filled = 0;
     int bytes_padded = 0;
 
