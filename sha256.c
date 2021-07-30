@@ -46,7 +46,6 @@ void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 	FILE* input_file = fopen(filename, "rb+");
 	
 	if (!input_file) { // Check for null pointer
-		printf("NULL pointer.\n"); 
 		return; 
 	} 
 	
@@ -63,7 +62,11 @@ void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 	int N = ceil((64 + 1 + l) / BIT_BLOCK_SIZE) + 1;
 	int k = (BIT_BLOCK_SIZE * N) - 65 - l;
 
-	block blocks[N];
+	block *blocks = malloc(sizeof(block) * N);
+
+	if (!blocks) {
+		return;
+	}
 
 	uint8_t parts[8];
 
