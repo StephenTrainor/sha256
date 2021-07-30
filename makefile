@@ -35,6 +35,9 @@ asm: $(REQ)
 	$(CC) main.c -S -fverbose-asm -o main.s $(CFLAGS)
 	$(CC) sha256.c -S -fverbose-asm -o sha256.s $(CFLAGS)
 
+so: $(REQ)
+	gcc -shared -Wl,-soname,sha256 -o sha256.so -fPIC sha256.c
+
 debug: $(REQ)
 	find . -type f -exec touch {} +
 	$(CC) main.c -c -o main.o $(CFLAGS) $(CDEBUG)
