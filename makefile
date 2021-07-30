@@ -1,9 +1,9 @@
 CC=gcc
 REQ=sha256.c sha256.h main.c
-CFLAGS=-Werror -Wextra -Wno-sign-compare -Wshadow -O3
+CFLAGS=-Werror -Wextra -Wno-sign-compare -Wshadow -O0
 CDEBUG=-g
 LIBS=-lm
-TXTFILE=texts/bible.txt
+TXTFILE=texts/abcabc.txt
 
 all: $(REQ)
 	find . -type f -exec touch {} +
