@@ -55,6 +55,7 @@ The Message Digest (output) is printed out in hexadecimal. To verify that my sha
 
 Run `make tests` or `make tets_windows` accordingly to use sha256.c
 Run `python tests.py` or `python3 tests.py` accordingly to use Python's hashlib.
+Run `python -V` or `python3 -V` to check if you have python installed
 
 ### Notes
 
