@@ -45,7 +45,7 @@ static bool little_endian(void);        // Function from https://www.cs-fundamen
 void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 	FILE* input_file = fopen(filename, "r");
 	
-	if (input_file == NULL) { // Check for null pointer
+	if (!input_file) { // Check for null pointer
 		printf("NULL pointer.\n"); 
 		return; 
 	} 
