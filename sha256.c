@@ -183,6 +183,7 @@ void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 	}
 
 	fclose(input_file);
+	free(blocks);
 	free(M);
 
 	return;
