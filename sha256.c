@@ -281,7 +281,7 @@ static bool little_endian(void) {
 	return (int)*c;
 }
 
-char* itoa(int val, int base){
+char* itoa_c(int val, int base){
 	
 	static char buf[32] = {0};
 	
