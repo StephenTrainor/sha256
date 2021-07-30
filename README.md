@@ -47,7 +47,14 @@ Write `#include "sha256.h"` or `#include "path/to/sha256.h"` (depending on how y
 
 The include at the top of `sha256.c` should also be adjusted accordingly to your use case.
 
-However, if `sha256.c` and `sha256.h` are in the same directory, the include in `sha256.c` shouldn't need to be modified.
+However, if `sha256.c` and `sha256.h` are in the same directory, the include in `sha256.c` doesn't need to be modified.
+
+### Message Digest
+
+The Message Digest (output) is printed out in hexadecimal. To verify that my sha256 implementation works, I created some simple tests.
+
+Run `make tests` or `make tets_windows` accordingly to use sha256.c
+Run `python tests.py` or `python3 tests.py` accordingly to use Python's hashlib.
 
 ### Notes
 
