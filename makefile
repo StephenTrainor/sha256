@@ -1,6 +1,6 @@
 CC=gcc
 REQ=sha256.c sha256.h main.c
-CFLAGS=-Werror -Wextra -Wno-sign-compare -Wshadow -O0
+CFLAGS=-Werror -Wextra -Wno-sign-compare -Wshadow -O3
 CDEBUG=-g
 LIBS=-lm
 TXTFILE=texts/bible.txt
@@ -13,6 +13,23 @@ all: $(REQ)
 	rm main.o
 	rm sha256.o
 	./sha256 $(TXTFILE)
+
+tests: tests.c sha256.c sha256.h
+	find . -type f -exec touch {} +
+	$(CC) tests.c -c -o tests.o $(CFLAGS)
+	$(CC) sha256.c -c -o sha256.o $(CFLAGS)
+	$(CC) tests.o sha256.o -o tests $(CLFAGS)
+	rm tests.o
+	rm sha256.o
+	./tests
+
+tests_windows: tests.c sha256.c sha256.h
+	$(CC) tests.c -c -o tests.o $(CFLAGS)
+	$(CC) sha256.c -c -o sha256.o $(CFLAGS)
+	$(CC) tests.o sha256.o -o tests $(CLFAGS)
+	del tests.o
+	del sha256.o
+	tests.exe
 
 clang: $(REQ)
 	find . -type f -exec touch {} +
