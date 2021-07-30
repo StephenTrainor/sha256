@@ -43,7 +43,7 @@ static char *getdelim_c(size_t *restrict n, int delim, FILE *restrict stream);
 static bool little_endian(void);        // Function from https://www.cs-fundamentals.com/tech-interview/c/c-program-to-check-little-and-big-endian-architecture/
 
 void sha256(char *restrict filename, uint32_t *restrict message_digest) {
-	FILE* input_file = fopen(filename, "r");
+	FILE* input_file = fopen(filename, "rb+");
 	
 	if (!input_file) { // Check for null pointer
 		printf("NULL pointer.\n"); 
@@ -51,8 +51,9 @@ void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 	} 
 	
 	size_t bytes = 0;
-	
+
 	char *M = getdelim_c(&bytes, '\0', input_file); // Read input_file into M
+	printf("bytes: %zu\n", bytes);
 
 	if (bytes == -1) {
 		bytes = 0; // Ensures that '\0' isn't hashed for an empty file
