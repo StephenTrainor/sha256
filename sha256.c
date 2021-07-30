@@ -239,7 +239,7 @@ static char *getdelim_c(size_t *restrict n, int delim, FILE *restrict stream) {
 		return NULL;
 	}
 
-    while ((temp = fgetc(stream)) != EOF && temp != delim && temp != '\n') { // continue if char != specified delimeter
+    while ((temp = fgetc(stream)) != EOF && temp != delim) { // continue if char != specified delimeter
         char *tmp_ptr = realloc(buf, (*n) + 1); // expand buffer
 
         if (!tmp_ptr) {

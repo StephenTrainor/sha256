@@ -57,6 +57,8 @@ Variables at the top of the makefile can be adjusted to your preferences
 
 Legacy just holds previous versions of my sha256 code
 
+In terms of optimizations, I use -O3 when compiling (sometimes -O2), `__restrict/restrict` when possible, and inlining the small functions. I am currently looking into removing branches in the code and using various bit hacks to make things go faster.
+
 ### Disclaimer
 
 I have not tested any of these programs on a mac
