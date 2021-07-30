@@ -74,7 +74,7 @@ In terms of optimizations, I use -O3 when compiling (sometimes -O2), `__restrict
 I have not tested any of these programs on a mac
 
 For `posix_sha256.c` only:
-    `posix_sha256.c` relies on a POSIX functions `getdelim()` that is not accessible on windows machines, even with `#define _GNU_SOURCE`. 
+    `posix_sha256.c` relies on a POSIX function `getdelim()` that is not accessible on windows machines, even with `#define _GNU_SOURCE`. 
 
 There are various indentation anomalies, but many of them are hard to get rid (tabs and spaces on my editor and github).
 
