@@ -1,6 +1,6 @@
-CC=gcc
+CC=clang
 REQ=sha256.c sha256.h main.c
-CFLAGS=-Werror -Wextra -Wno-sign-compare -Wshadow -O3
+CFLAGS=-Werror -Wextra -Wno-sign-compare -Wshadow -Ofast -O3
 CDEBUG=-g
 LIBS=-lm
 TXTFILE=texts/bible.txt
@@ -52,6 +52,9 @@ asm: $(REQ)
 	$(CC) main.c -S -fverbose-asm -o main.s $(CFLAGS)
 	$(CC) sha256.c -S -fverbose-asm -o sha256.s $(CFLAGS)
 
+asm_macro: macro.c macro_test.c macro.h
+	clang macro.c -S -fverbose-asm -o macro.s $(CFLAGS)
+
 so: $(REQ)
 	gcc -shared -Wl,-soname,sha256 -o sha256.so -fPIC sha256.c
 
@@ -63,4 +66,3 @@ debug: $(REQ)
 	rm main.o
 	rm sha256.o
 	./sha256 $(TXTFILE)
-
