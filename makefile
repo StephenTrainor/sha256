@@ -58,6 +58,9 @@ asm_macro: macro.c macro_test.c macro.h
 so: $(REQ)
 	gcc -shared -Wl,-soname,sha256 -o sha256.so -fPIC sha256.c
 
+so_mac: $(REQ)
+	gcc -shared -Wl,-install_name,sha256.so -o sha256.so -fPIC sha256.c
+
 debug: $(REQ)
 	find . -type f -exec touch {} +
 	$(CC) main.c -c -o main.o $(CFLAGS) $(CDEBUG)
