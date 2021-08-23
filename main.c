@@ -7,14 +7,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    uint32_t H[8];
-
-    sha256(argv[1], H);
-
-    for (int i = 0; i < 8; i++) {
-        printf("%08x", H[i]);
-    }
-    printf("\n");
+    sha256(argv[1]);
 
     return 0;
 }
