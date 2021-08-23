@@ -30,9 +30,8 @@ static const uint32_t K[64] = {
  * can be removed as long as the function bodies are moved above sha256().
  ************************************************************************/
 
-static inline uint32_t rotr(uint32_t x, uint8_t n);
-static inline uint32_t rotl(uint32_t x, uint8_t n);
-static inline uint32_t shr(uint32_t x, uint8_t n);
+static inline uint32_t r(uint32_t x, uint8_t n);
+static inline uint32_t s(uint32_t x, uint8_t n);
 static inline uint32_t ch(uint32_t x, uint32_t y, uint32_t z);
 static inline uint32_t maj(uint32_t x, uint32_t y, uint32_t z);
 static inline uint32_t SIGMA0(uint32_t x);
@@ -42,7 +41,8 @@ static inline uint32_t sigma1(uint32_t x);
 static char *getdelim_c(size_t *restrict n, int delim, FILE *restrict stream);
 static bool little_endian(void);        // Function from https://www.cs-fundamentals.com/tech-interview/c/c-program-to-check-little-and-big-endian-architecture/
 
-void sha256(char *restrict filename, uint32_t *restrict message_digest) {
+// void sha256(char *restrict filename, uint32_t *restrict message_digest) {
+void sha256(char *restrict filename) {
 	FILE* input_file = fopen(filename, "rb+");
 	
 	if (!input_file) { // Check for null pointer
@@ -60,6 +60,7 @@ void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 	uint64_t l = bytes * 8;
 	int N = ceil((64 + 1 + l) / BIT_BLOCK_SIZE) + 1;
 	int k = (BIT_BLOCK_SIZE * N) - 65 - l;
+	int i = 0;
 
 	block *blocks = malloc(sizeof(block) * N);
 
@@ -68,58 +69,46 @@ void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 	}
 
 	uint8_t parts[8];
+	memcpy(parts, &l, sizeof(l));
 
 	if (little_endian()) {
-		uint8_t temp_parts[8]; 
-
-		memcpy(temp_parts, &l, sizeof(l));
-
-		for (int i = 0; i < 8; i++) {
-			parts[i] = temp_parts[7 - i]; // Reverse the array to convert to big-endian
+		for (i = 0; i < 8; i++) {
+			blocks[N - 1].p[56 + i] = parts[7 - i]; // Reverse parts to convert to big-endian
 		}
 	}
 	else {
-		memcpy(parts, &l, sizeof(l)); // Already big-endian, no changes needed
-	}
-
-	bool finished_filling = false;
-	bool finished_padding = false;
-
-	int padding_bytes_needed = (k + 1) / 8;
-	int bytes_filled = 0;
-	int bytes_padded = 0;
-
-	for (int a = 0; a < N; a++) {
-		for (int b = 0; b < BIT_BLOCK_SIZE / 8; b++) {
-			if (bytes_filled == bytes) {
-				finished_filling = true;
-			}
-			if (bytes_padded == padding_bytes_needed) {
-				finished_padding = true;
-			}
-
-			if (finished_filling && !finished_padding) {
-				if (bytes_padded != 0) {
-					blocks[a].p[b] = 0x00; // Pad message with zeroes
-				}
-				else {
-					blocks[a].p[b] = 0x80; // aka 0b10000000
-				}
-				bytes_padded++;
-			}
-			else if (finished_filling && finished_padding) {
-				for (int i = 0; i < 8; i++) {
-					blocks[a].p[b + i] = parts[i]; // add the 64-bit message length signature
-				}
-				break;
-			}
-			else {
-				blocks[a].p[b] = M[bytes_filled]; // Fill message block
-				bytes_filled++;
-			}
+		for (i = 0; i < 8; i++) {
+			blocks[N - 1].p[56 + i] = parts[i]; // already big-endian, no changes needed
 		}
 	}
 
+	int padding_bytes_needed = (k + 1) / 8;
+	int bytes_filled = 0;
+	int t, x, y;
+
+	for (x = 0; x < N; x++) {
+		for (y = 0; y < BLOCK_BYTES; y++) {
+			if (bytes_filled == bytes) {
+				blocks[x++].p[y] = 0x80; // aka 0b10000000
+				break;
+			}
+			
+			blocks[x].p[y] = M[bytes_filled]; // Fill message block
+			bytes_filled++;
+		}
+	}
+
+	for (; x < N; x++) {
+		for (; y < BLOCK_BYTES; y++) {
+			if (!padding_bytes_needed) {
+				break;
+			}
+
+			blocks[x].p[y] = 0x00; // Pad message with zeroes
+			padding_bytes_needed--;
+		}
+	}
+	
 	uint32_t T1, T2; // Temp words
 
 	uint32_t a, b, c, d, e, f, g, h; // Working variables
@@ -137,12 +126,12 @@ void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 		0x5be0cd19
 	};
 
-	for (unsigned int i = 0; i < N; i++) {
-		for (unsigned int t = 0; t < 64; t += 4) {
+	for (i = 0; i < N; i++) {
+		for (t = 0; t < 64; t += 4) {
 			W[t / 4] = blocks[i].p[t] << 24 | blocks[i].p[t + 1] << 16 | blocks[i].p[t + 2] << 8 | blocks[i].p[t + 3]; // Concat four uint8_t's into one 32-bit word
 		}
 
-		for (unsigned int t = 16; t < 64; t++) { 
+		for (t = 16; t < 64; t++) { 
 			W[t] = sigma1(W[t - 2]) + W[t - 7] + sigma0(W[t - 15]) + W[t - 16]; // Fill the message schedule
 		}
 
@@ -155,7 +144,7 @@ void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 		g = H[6];
 		h = H[7];
 
-		for (unsigned int t = 0; t < 64; t++) { // loop through message schedule and constants
+		for (t = 0; t < 64; t++) { // loop through message schedule and constants
 			T1 = h + SIGMA1(e) + ch(e, f, g) + K[t] + W[t];
 			T2 = SIGMA0(a) + maj(a, b, c);
 			h = g;
@@ -178,51 +167,46 @@ void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 		H[7] += h;
 	}
 
-	for (unsigned int i = 0; i < 8; i++) {
-		message_digest[i] = H[i];
+	for (i = 0; i < 8; i++) {
+		printf("%08x", H[i]);
 	}
+	printf("\n");
 
 	fclose(input_file);
 	free(blocks);
 	free(M);
-
-	return;
 }
 
-static inline uint32_t rotr(uint32_t x, uint8_t n) {
-	return (x >> n) | (x << (32 - n));
+static inline uint32_t r(uint32_t x, uint8_t n) {
+	return ((((unsigned long)(x) & 0xFFFFFFFFUL) >> (unsigned long) ((n) & 31)) | ((unsigned long)(x) << (unsigned long) (32 - ((n) & 31)))) & 0xFFFFFFFFUL;
 }
 
-static inline uint32_t rotl(uint32_t x, uint8_t n) {
-	return (x << n) | (x >> (32 - n));
-}
-
-static inline uint32_t shr(uint32_t x, uint8_t n) {
-	return x >> n;
+static inline uint32_t s(uint32_t x, uint8_t n) {
+	return ((x) & 0xFFFFFFFFUL) >> (n);
 }
 
 static inline uint32_t ch(uint32_t x, uint32_t y, uint32_t z) {
-	return (x & y) ^ ((~x) & z);
+	return z ^ (x & (y ^ z));
 }
 
 static inline uint32_t maj(uint32_t x, uint32_t y, uint32_t z) {
-	return (x & y) ^ (x & z) ^ (y & z);
+	return ((x | y) & z) | (x & y);
 }
 
 static inline uint32_t SIGMA0(uint32_t x) {
-	return rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22);
+	return r(x, 2) ^ r(x, 13) ^ r(x, 22);
 }
 
 static inline uint32_t SIGMA1(uint32_t x) {
-	return rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25);
+	return r(x, 6) ^ r(x, 11) ^ r(x, 25);
 }
 
 static inline uint32_t sigma0(uint32_t x) {
-	return rotr(x, 7) ^ rotr(x, 18) ^ shr(x, 3);
+	return r(x, 7) ^ r(x, 18) ^ s(x, 3);
 }
 
 static inline uint32_t sigma1(uint32_t x) {
-	return rotr(x, 17) ^ rotr(x, 19) ^ shr(x, 10);
+	return r(x, 17) ^ r(x, 19) ^ s(x, 10);
 }
 
 static char *getdelim_c(size_t *restrict n, int delim, FILE *restrict stream) {
