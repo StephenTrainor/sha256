@@ -2,14 +2,16 @@
 #define SHA256_H
 
 #define BIT_BLOCK_SIZE 512
+#define BLOCK_BYTES 64
 
 #include <stdint.h>
 
 typedef struct {
-	uint8_t p[64];
+	uint8_t p[BLOCK_BYTES];
 } block;
 
-void sha256(char *restrict filename, uint32_t *restrict message_digest);
+// void sha256(char *restrict filename, uint32_t *restrict message_digest);
+void sha256(char *restrict filename);
 
 #endif
 
