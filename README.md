@@ -59,9 +59,9 @@ Run `python tests.py` or `python3 tests.py` accordingly to use Python's hashlib.
 
 Run `python -V` or `python3 -V` to check if you have python installed
 
-### .So
+### .so
 
-sha256() can be compiled into a .so, but only on UNIX machines. 
+`sha256()` can be compiled into a .so, but only on UNIX machines. 
 
 Use `make so` for linux/WSL or `make so_mac` for mac.
 
