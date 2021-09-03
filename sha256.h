@@ -10,7 +10,6 @@ typedef struct {
 	uint8_t p[BLOCK_BYTES];
 } block;
 
-// void sha256(char *restrict filename, uint32_t *restrict message_digest);
 void sha256(char *restrict filename);
 
 #endif
