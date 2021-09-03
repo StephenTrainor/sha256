@@ -41,7 +41,6 @@ static inline uint32_t sigma1(uint32_t x);
 static char *getdelim_c(size_t *restrict n, int delim, FILE *restrict stream);
 static bool little_endian(void);        // Function from https://www.cs-fundamentals.com/tech-interview/c/c-program-to-check-little-and-big-endian-architecture/
 
-// void sha256(char *restrict filename, uint32_t *restrict message_digest) {
 void sha256(char *restrict filename) {
 	FILE* input_file = fopen(filename, "rb+");
 	
@@ -60,12 +59,18 @@ void sha256(char *restrict filename) {
 	uint64_t l = bytes * 8;
 	int N = ceil((64 + 1 + l) / BIT_BLOCK_SIZE) + 1;
 	int k = (BIT_BLOCK_SIZE * N) - 65 - l;
-	int i = 0;
+	int t, x, y, i = 0;
 
 	block *blocks = malloc(sizeof(block) * N);
 
 	if (!blocks) {
 		return;
+	}
+
+	for (x = 0; x < N; x++) {
+		for (y = 0; y < BLOCK_BYTES; y++) {
+			blocks[x].p[y] = 0x00; // ensure there are no garbage values (mainly for porting to python2)
+		}
 	}
 
 	uint8_t parts[8];
@@ -84,7 +89,6 @@ void sha256(char *restrict filename) {
 
 	int padding_bytes_needed = (k + 1) / 8;
 	int bytes_filled = 0;
-	int t, x, y;
 
 	for (x = 0; x < N; x++) {
 		for (y = 0; y < BLOCK_BYTES; y++) {
