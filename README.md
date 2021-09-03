@@ -59,6 +59,16 @@ Run `python tests.py` or `python3 tests.py` accordingly to use Python's hashlib.
 
 Run `python -V` or `python3 -V` to check if you have python installed
 
+### .So
+
+sha256() can be compiled into a .so, but only on UNIX machines. 
+
+Use `make so` for linux/WSL or `make so_mac` for mac.
+
+Load .so with `CDLL()` from `ctypes` as seen in `so.py`
+
+Run with python2, python3 is not supported yet.
+
 ### Notes
 
 Any lines with `find . -type f -exec touch {} +` can be removed (from the makefile)
