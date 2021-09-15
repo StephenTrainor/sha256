@@ -1,6 +1,5 @@
 # sha256
-
-### A sha256 implementation in C
+A sha256 implementation in C
 
 This implementation uses C without any external libraries. Only `little_endian()` came from outside sources. GCC is not the only compiler that works with this program, this program also works with clang. By default, running `make` will use gcc. This can be changed by editing the makefile or running `make clang`.
 
